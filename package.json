@@ -1,0 +1,14 @@
+{
+  "name": "g-eglise",
+  "version": "1.0.0",
+  "description": "Application de gestion d'église - Centre d'Évangélisation BETHANIE",
+  "private": true,
+  "scripts": {
+    "build": "echo Build completed"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/cli": "^8.0.0",
+    "@capacitor/core": "^8.0.0"
+  }
+}
