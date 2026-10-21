@@ -3302,8 +3302,11 @@
                 const user = users.find(u => u.username === username && u.password === password);
                 if (!user) return false;
 
-                this.currentUser = user;
-                localStorage.setItem('G_EGLISE_SESSION', JSON.stringify(user));
+                // Ne jamais conserver le mot de passe dans la session active ou localStorage.
+                const safeUser = { ...user };
+                delete safeUser.password;
+                this.currentUser = safeUser;
+                localStorage.setItem('G_EGLISE_SESSION', JSON.stringify(safeUser));
                 this.updateUI();
                 App.applyAccessControl();
                 return true;
