@@ -2937,8 +2937,11 @@
             appId: "1:314320326606:web:f900e8b192f6cda5aae59f"
         };
 
-        const FirebaseApp = firebase.initializeApp(firebaseConfig);
-        const FirebaseDB = FirebaseApp.database();
+        // Firebase est facultatif au démarrage : si les scripts cloud ne sont pas disponibles,
+        // l'application locale reste utilisable et les mutations peuvent rester en attente.
+        const FirebaseAvailable = typeof firebase !== 'undefined' && typeof firebase.initializeApp === 'function';
+        const FirebaseApp = FirebaseAvailable ? firebase.initializeApp(firebaseConfig) : null;
+        const FirebaseDB = FirebaseApp ? FirebaseApp.database() : null;
 
         /**
          * Synchronisation centrale de G-Église.
@@ -3035,7 +3038,7 @@
                 finally { this.applyingRemote = false; }
             },
             async init() {
-                if (this.initialized || !navigator.onLine) return;
+                if (this.initialized || !navigator.onLine || !FirebaseAvailable || !FirebaseDB) return;
                 try {
                     for (const storeName of this.stores) await this.bootstrapStore(storeName);
                     this.initialized = true;
