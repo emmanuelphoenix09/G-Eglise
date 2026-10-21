@@ -10,7 +10,7 @@ Le dépôt existant contient déjà une interface fonctionnelle et des modules d
 
 1. **Authentification locale uniquement** : la méthode `Auth.login()` compare l'identifiant et le mot de passe avec les objets du magasin IndexedDB `utilisateurs`. Aucun appel à Firebase Authentication n'est présent dans ce flux.
 2. **Mot de passe stocké en clair** : le code compare directement `u.password === password`. Les comptes existants doivent être migrés avec une procédure contrôlée ; ne pas copier les mots de passe en clair dans Firebase.
-3. **Session locale contenant l'objet utilisateur** : `G_EGLISE_SESSION` est écrit dans `localStorage`. La session doit être repensée pour ne jamais conserver le mot de passe et pour gérer expiration/déconnexion.
+3. **Session locale** : la branche de reconstruction retire maintenant le champ `password` de la session enregistrée et nettoie les anciennes sessions lors de leur restauration. Cela ne corrige pas le stockage en clair des mots de passe dans le magasin IndexedDB `utilisateurs` et ne remplace pas une authentification serveur.
 4. **Synchronisation Firebase sans identité utilisateur démontrée** : le code `FirebaseSync` lit et écrit sous `geglise/{storeName}` via la Realtime Database. Le code client seul ne prouve pas que les règles Firebase bloquent les utilisateurs non autorisés.
 5. **Permissions appliquées côté interface** : les permissions `Auth.can()` masquent/ouvrent les modules mais ne remplacent pas les règles de sécurité serveur.
 
