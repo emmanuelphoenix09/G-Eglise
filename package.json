@@ -1,0 +1,52 @@
+{
+  "name": "g-eglise-desktop",
+  "version": "1.0.0",
+  "description": "G-Eglise — application de gestion du Centre d'Évangélisation BETHANIE",
+  "main": "electron/main.cjs",
+  "author": "PhoenixArt",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis --x64",
+    "dist:dir": "electron-builder --dir --win"
+  },
+  "devDependencies": {
+    "electron": "^35.0.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.phoenixart.geglise",
+    "productName": "G-Eglise",
+    "asar": true,
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "index.html",
+      "electron/**/*",
+      "package.json",
+      "github/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "G-Eglise-Setup-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "G-Eglise",
+      "deleteAppDataOnUninstall": false
+    }
+  }
+}
