@@ -8,8 +8,8 @@
   "private": true,
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder --win nsis --x64",
-    "dist:dir": "electron-builder --dir --win"
+    "dist": "electron-builder --win nsis --x64 --publish never",
+    "dist:dir": "electron-builder --dir --win --publish never"
   },
   "devDependencies": {
     "electron": "^35.0.0",
@@ -19,24 +19,10 @@
     "appId": "com.phoenixart.geglise",
     "productName": "G-Eglise",
     "asar": true,
-    "directories": {
-      "output": "dist"
-    },
-    "files": [
-      "index.html",
-      "electron/**/*",
-      "package.json",
-      "github/**/*"
-    ],
+    "directories": { "output": "dist" },
+    "files": ["index.html", "electron/**/*", "package.json", "github/**/*"],
     "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        }
-      ],
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
       "artifactName": "G-Eglise-Setup-${version}-${arch}.${ext}"
     },
     "nsis": {
