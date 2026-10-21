@@ -3286,7 +3286,13 @@
                 const session = localStorage.getItem('G_EGLISE_SESSION');
                 if (session) {
                     try {
-                        this.currentUser = JSON.parse(session);
+                        const restoredUser = JSON.parse(session);
+                        if (restoredUser && typeof restoredUser === 'object') {
+                            delete restoredUser.password;
+                            this.currentUser = restoredUser;
+                            // Nettoie également les anciennes sessions qui pouvaient contenir le mot de passe.
+                            localStorage.setItem('G_EGLISE_SESSION', JSON.stringify(restoredUser));
+                        }
                         this.updateUI();
                     } catch (error) {
                         // Une session corrompue est supprimée pour éviter un blocage.
