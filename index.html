@@ -11,9 +11,9 @@
          ========================================================= -->
 
     <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css">
     <!-- Chart.js for Visual Stats -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="node_modules/chart.js/dist/chart.umd.js"></script>
     <!-- Polices système : l'application peut fonctionner hors ligne. -->
     
     <!-- =========================================================
@@ -2937,8 +2937,11 @@
             appId: "1:314320326606:web:f900e8b192f6cda5aae59f"
         };
 
-        const FirebaseApp = firebase.initializeApp(firebaseConfig);
-        const FirebaseDB = FirebaseApp.database();
+        // Firebase est facultatif au démarrage : si les scripts cloud ne sont pas disponibles,
+        // l'application locale reste utilisable et les mutations peuvent rester en attente.
+        const FirebaseAvailable = typeof firebase !== 'undefined' && typeof firebase.initializeApp === 'function';
+        const FirebaseApp = FirebaseAvailable ? firebase.initializeApp(firebaseConfig) : null;
+        const FirebaseDB = FirebaseApp ? FirebaseApp.database() : null;
 
         /**
          * Synchronisation centrale de G-Église.
@@ -3035,7 +3038,7 @@
                 finally { this.applyingRemote = false; }
             },
             async init() {
-                if (this.initialized || !navigator.onLine) return;
+                if (this.initialized || !navigator.onLine || !FirebaseAvailable || !FirebaseDB) return;
                 try {
                     for (const storeName of this.stores) await this.bootstrapStore(storeName);
                     this.initialized = true;
@@ -3283,7 +3286,13 @@
                 const session = localStorage.getItem('G_EGLISE_SESSION');
                 if (session) {
                     try {
-                        this.currentUser = JSON.parse(session);
+                        const restoredUser = JSON.parse(session);
+                        if (restoredUser && typeof restoredUser === 'object') {
+                            delete restoredUser.password;
+                            this.currentUser = restoredUser;
+                            // Nettoie également les anciennes sessions qui pouvaient contenir le mot de passe.
+                            localStorage.setItem('G_EGLISE_SESSION', JSON.stringify(restoredUser));
+                        }
                         this.updateUI();
                     } catch (error) {
                         // Une session corrompue est supprimée pour éviter un blocage.
@@ -3299,8 +3308,11 @@
                 const user = users.find(u => u.username === username && u.password === password);
                 if (!user) return false;
 
-                this.currentUser = user;
-                localStorage.setItem('G_EGLISE_SESSION', JSON.stringify(user));
+                // Ne jamais conserver le mot de passe dans la session active ou localStorage.
+                const safeUser = { ...user };
+                delete safeUser.password;
+                this.currentUser = safeUser;
+                localStorage.setItem('G_EGLISE_SESSION', JSON.stringify(safeUser));
                 this.updateUI();
                 App.applyAccessControl();
                 return true;
